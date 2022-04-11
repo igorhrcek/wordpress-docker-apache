@@ -1,9 +1,3 @@
-#
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#
-# PLEASE DO NOT EDIT IT DIRECTLY.
-#
-
 FROM php:7.4-apache
 
 # persistent dependencies
@@ -103,7 +97,7 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/error-logging.ini
 
 RUN set -eux; \
-	a2enmod rewrite expires; \
+	a2enmod rewrite expires headers; \
 	\
 # https://httpd.apache.org/docs/2.4/mod/mod_remoteip.html
 	a2enmod remoteip; \
@@ -148,22 +142,12 @@ RUN set -eux; \
 		echo '# END WordPress'; \
 	} > /usr/src/wordpress/.htaccess; \
 	\
-	#chown -R runner:runner /usr/src/wordpress; \
-# pre-create wp-content (and single-level children) for folks who want to bind-mount themes, etc so permissions are pre-created properly instead of root:root
-# wp-content/cache: https://github.com/docker-library/wordpress/issues/534#issuecomment-705733507
-	mkdir wp-content; \
-	for dir in /usr/src/wordpress/wp-content/*/ cache; do \
-		dir="$(basename "${dir%/}")"; \
-		mkdir "wp-content/$dir"; \
-	done; \
-	#chown -R runner:runner wp-content; \
-	chmod -R 777 wp-content
+	chown -R www-data:www-data /usr/src/wordpress; \
+    cp -R /usr/src/wordpress/* /var/www/html; \
+    rm -Rf /usr/src/wordpress; \
 
 VOLUME /var/www/html
 
-#COPY --chown=runner:runner wp-config-docker.php /usr/src/wordpress/
-COPY wp-config-docker.php /usr/src/wordpress/
-COPY docker-entrypoint.sh /usr/local/bin/
+COPY --chown=www-data:www-data wp-config-docker.php /usr/src/wordpress/
 
-ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
