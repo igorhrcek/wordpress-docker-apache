@@ -145,9 +145,20 @@ RUN set -eux; \
 	chown -R www-data:www-data /usr/src/wordpress; \
     cp -R /usr/src/wordpress/* /var/www/html; \
     rm -Rf /usr/src/wordpress; \
+# pre-create wp-content (and single-level children) for folks who want to bind-mount themes, etc so permissions are pre-created properly instead of root:root
+# wp-content/cache: https://github.com/docker-library/wordpress/issues/534#issuecomment-705733507
+#	mkdir wp-content; \
+#	for dir in /usr/src/wordpress/wp-content/*/ cache; do \
+#		dir="$(basename "${dir%/}")"; \
+#		mkdir "wp-content/$dir"; \
+#	done; \
+#	chown -R www-data:www-data wp-content; \
+#	chmod -R 777 wp-content
 
 VOLUME /var/www/html
 
 COPY --chown=www-data:www-data wp-config-docker.php /usr/src/wordpress/
-
+#COPY docker-entrypoint.sh /usr/local/bin/
+#
+#ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
