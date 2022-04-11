@@ -148,7 +148,7 @@ RUN set -eux; \
 		echo '# END WordPress'; \
 	} > /usr/src/wordpress/.htaccess; \
 	\
-	chown -R runner:runner /usr/src/wordpress; \
+	#chown -R runner:runner /usr/src/wordpress; \
 # pre-create wp-content (and single-level children) for folks who want to bind-mount themes, etc so permissions are pre-created properly instead of root:root
 # wp-content/cache: https://github.com/docker-library/wordpress/issues/534#issuecomment-705733507
 	mkdir wp-content; \
@@ -156,11 +156,12 @@ RUN set -eux; \
 		dir="$(basename "${dir%/}")"; \
 		mkdir "wp-content/$dir"; \
 	done; \
-	chown -R runner:runner wp-content; \
+	#chown -R runner:runner wp-content; \
 	chmod -R 777 wp-content
 
 VOLUME /var/www/html
 
+#COPY --chown=runner:runner wp-config-docker.php /usr/src/wordpress/
 COPY --chown=runner:runner wp-config-docker.php /usr/src/wordpress/
 COPY docker-entrypoint.sh /usr/local/bin/
 
