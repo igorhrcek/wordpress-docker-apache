@@ -142,9 +142,7 @@ RUN set -eux; \
 		echo '# END WordPress'; \
 	} > /usr/src/wordpress/.htaccess; \
 	\
-	chown -R www-data:www-data /usr/src/wordpress; \
-    cp -R /usr/src/wordpress/* /var/www/html; \
-    rm -Rf /usr/src/wordpress
+	chown -R www-data:www-data /usr/src/wordpress
 # pre-create wp-content (and single-level children) for folks who want to bind-mount themes, etc so permissions are pre-created properly instead of root:root
 # wp-content/cache: https://github.com/docker-library/wordpress/issues/534#issuecomment-705733507
 #	mkdir wp-content; \
